@@ -1,4 +1,4 @@
-module github.com/0xPolygon/go-ibft
+module github.com/Route3/go-ibft
 
 go 1.17
 
