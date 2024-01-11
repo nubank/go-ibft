@@ -3,7 +3,7 @@ package messages
 import (
 	"testing"
 
-	"github.com/0xPolygon/go-ibft/messages/proto"
+	"github.com/nubank/go-ibft/messages/proto"
 	"github.com/stretchr/testify/assert"
 )
 

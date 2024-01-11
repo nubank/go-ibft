@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/0xPolygon/go-ibft/messages"
-	"github.com/0xPolygon/go-ibft/messages/proto"
+	"github.com/nubank/go-ibft/messages"
+	"github.com/nubank/go-ibft/messages/proto"
 )
 
 type Logger interface {
@@ -130,11 +130,14 @@ func (i *IBFT) startRoundTimer(ctx context.Context, round uint64) {
 	)
 
 	//	Create a new timer instance
-	timer := time.NewTimer(roundTimeout + i.additionalTimeout)
+	totalTimeout := roundTimeout + i.additionalTimeout
+	timer := time.NewTimer(totalTimeout)
+	i.log.Debug("round timer set", "round", round, "timeout", totalTimeout)
 
 	select {
 	case <-ctx.Done():
 		// Stop signal received, stop the timer
+		i.log.Debug("timer stop signal received", "round", round, "timeout", totalTimeout)
 		timer.Stop()
 	case <-timer.C:
 		// Timer expired, alert the round change channel to move
@@ -158,7 +161,9 @@ func (i *IBFT) signalRoundExpired(ctx context.Context) {
 func (i *IBFT) signalRoundDone(ctx context.Context) {
 	select {
 	case i.roundDone <- struct{}{}:
-	case <-ctx.Done():
+		i.log.Debug("signal: round done")
+	case <-ctx.Done(): // Must exist due to blocking nature of writing to unbuffered round done
+		i.log.Debug("signal: round done cancelled due to parent context")
 	}
 }
 
@@ -342,6 +347,7 @@ func (i *IBFT) RunSequence(ctx context.Context, h uint64) {
 			// The consensus cycle for the block height is finished.
 			// Stop all running worker threads
 			teardown()
+			i.insertBlock()
 
 			return
 		case <-ctx.Done():
@@ -514,10 +520,7 @@ func (i *IBFT) runStates(ctx context.Context) {
 		case commit:
 			timeout = i.runCommit(ctx)
 		case fin:
-			i.runFin()
-			//	Block inserted without any errors,
-			// sequence is complete
-			i.signalRoundDone(ctx)
+			i.runFin(ctx)
 
 			return
 		}
@@ -894,10 +897,18 @@ func (i *IBFT) handleCommit(view *proto.View, quorum uint64) bool {
 	return true
 }
 
-// runFin runs the fin state (block insertion)
-func (i *IBFT) runFin() {
+// runFin signals that the round is done
+func (i *IBFT) runFin(ctx context.Context) {
 	i.log.Debug("enter: fin state")
 	defer i.log.Debug("exit: fin state")
+
+	i.signalRoundDone(ctx)
+}
+
+// insertBlock inserts the block
+func (i *IBFT) insertBlock() {
+	i.log.Debug("enter: insert block")
+	defer i.log.Debug("exit: insert block")
 
 	// Insert the block to the node's underlying
 	// blockchain layer
