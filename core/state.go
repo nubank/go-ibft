@@ -3,8 +3,8 @@ package core
 import (
 	"sync"
 
-	"github.com/Route3/go-ibft/messages"
-	"github.com/Route3/go-ibft/messages/proto"
+	"github.com/nubank/go-ibft/messages"
+	"github.com/nubank/go-ibft/messages/proto"
 )
 
 type stateType uint8

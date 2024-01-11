@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Route3/go-ibft/messages"
-	"github.com/Route3/go-ibft/messages/proto"
+	"github.com/nubank/go-ibft/messages"
+	"github.com/nubank/go-ibft/messages/proto"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -1041,6 +1041,7 @@ func TestRunCommit(t *testing.T) {
 
 			i.wg.Add(1)
 			i.startRound(ctx)
+			i.insertBlock()
 
 			i.wg.Wait()
 

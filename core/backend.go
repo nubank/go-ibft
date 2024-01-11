@@ -1,8 +1,8 @@
 package core
 
 import (
-	"github.com/Route3/go-ibft/messages"
-	"github.com/Route3/go-ibft/messages/proto"
+	"github.com/nubank/go-ibft/messages"
+	"github.com/nubank/go-ibft/messages/proto"
 )
 
 // MessageConstructor defines a message constructor interface

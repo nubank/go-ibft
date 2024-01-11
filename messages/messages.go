@@ -3,7 +3,7 @@ package messages
 import (
 	"sync"
 
-	"github.com/Route3/go-ibft/messages/proto"
+	"github.com/nubank/go-ibft/messages/proto"
 )
 
 // Messages contains the relevant messages for each view (height, round)

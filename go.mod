@@ -1,4 +1,4 @@
-module github.com/Route3/go-ibft
+module github.com/nubank/go-ibft
 
 go 1.17
 
